@@ -4,23 +4,33 @@ from datetime import datetime
 import logging
 import os
 
+# Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Crear la aplicación Flask
 app = Flask(__name__)
 CORS(app, origins=["*"], allow_headers=["Content-Type", "Authorization"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
+# Lista en memoria para almacenar los mensajes enviados
 mensajes_enviados = []
 
+# Ruta raíz para verificar que el backend funciona
+@app.route('/', methods=['GET'])
+def home():
+    return "¡Backend funcionando correctamente desde Flask en Render!"
+
+# Ruta de estado del backend
 @app.route('/status', methods=['GET'])
 def status():
     current_time = datetime.now().isoformat()
     return jsonify({
-        'message': 'Backend funcionando correctamente', 
+        'message': 'Backend funcionando correctamente',
         'time': current_time,
         'total_messages': len(mensajes_enviados)
     })
 
+# Ruta para enviar mensajes
 @app.route('/send-message', methods=['POST'])
 def send_message():
     try:
@@ -55,6 +65,7 @@ def send_message():
         logger.error(f"Error al enviar mensaje: {str(e)}")
         return jsonify({'error': 'Error interno del servidor'}), 500
 
+# Ruta para obtener todos los mensajes enviados
 @app.route('/messages', methods=['GET'])
 def get_messages():
     return jsonify({
@@ -62,6 +73,7 @@ def get_messages():
         'total': len(mensajes_enviados)
     })
 
+# Iniciar el servidor
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
