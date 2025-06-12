@@ -14,8 +14,8 @@ app = Flask(__name__)
 CORS(app, origins=["*"], allow_headers=["Content-Type", "Authorization"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
 # Variables para Telegram
-TELEGRAM_BOT_TOKEN = 
-TELEGRAM_CHAT_ID = "5821178446"
+TELEGRAM_BOT_TOKEN = os.environ.get
+TELEGRAM_CHAT_ID = os.environ.get
 
 # Lista en memoria para almacenar los mensajes enviados
 mensajes_enviados = []
