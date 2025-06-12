@@ -1,3 +1,22 @@
+# Instrucciones para actualizar tu repositorio en GitHub
+
+## Paso 1: Eliminar archivo actual
+1. Ve a tu repositorio: https://github.com/Bohemio193/scheduler-backend
+2. Haz clic en el archivo `app.py`
+3. Haz clic en el ícono de papelera (🗑️) para eliminarlo
+4. Escribe "Delete old app.py" en el commit message
+5. Haz clic en "Commit changes"
+
+## Paso 2: Subir archivo corregido
+1. En la página principal del repositorio, haz clic en "Add file" → "Upload files"
+2. Arrastra el archivo `app_render_fixed.py` (o cópialo desde aquí)
+3. **IMPORTANTE**: Antes de hacer commit, renombra el archivo de `app_render_fixed.py` a `app.py`
+4. Escribe "Add corrected app.py for Render" en el commit message
+5. Haz clic en "Commit changes"
+
+## Contenido del archivo app.py (copia esto si no puedes subir el archivo):
+
+```python
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
@@ -9,7 +28,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-# Configurar CORS más específicamente para PWA
 CORS(app, origins=["*"], allow_headers=["Content-Type", "Authorization"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
 # Lista para almacenar mensajes enviados
@@ -29,24 +47,19 @@ def status():
 def send_message():
     """Endpoint para enviar mensajes"""
     try:
-        # Verificar que el request contiene JSON
         if not request.is_json:
             return jsonify({'error': 'Content-Type debe ser application/json'}), 400
         
         data = request.get_json()
-        
-        # Validar datos requeridos
         contacto = data.get('contact')
         mensaje = data.get('message')
         
         if not contacto or not mensaje:
             return jsonify({'error': 'Faltan datos de contacto o mensaje'}), 400
         
-        # Validar que no sean strings vacíos
         if not contacto.strip() or not mensaje.strip():
             return jsonify({'error': 'Contacto y mensaje no pueden estar vacíos'}), 400
         
-        # Crear el objeto mensaje
         nuevo_mensaje = {
             'id': len(mensajes_enviados) + 1,
             'contact': contacto.strip(),
@@ -55,9 +68,7 @@ def send_message():
             'status': 'enviado'
         }
         
-        # Agregar a la lista
         mensajes_enviados.append(nuevo_mensaje)
-        
         logger.info(f"Mensaje enviado a {contacto}: {mensaje}")
         
         return jsonify({
@@ -112,3 +123,13 @@ if __name__ == "__main__":
     # Usar puerto de Render si está disponible
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+```
+
+## Paso 3: Verificar archivos en tu repositorio
+Asegúrate de tener exactamente estos 3 archivos:
+- `app.py` (el archivo corregido de arriba)
+- `requirements.txt` (con Flask==2.3.3, Flask-CORS==4.0.0, gunicorn==21.2.0)
+- `Procfile` (con: web: python app.py)
+
+## Paso 4: Deploy en Render
+Una vez que tengas los archivos actualizados, regresa a Render y haz clic en "Implementar servicio web"
