@@ -3,6 +3,7 @@ from flask_cors import CORS
 from datetime import datetime
 import logging
 import os
+import requests  # Para enviar a Telegram
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -12,8 +13,24 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app, origins=["*"], allow_headers=["Content-Type", "Authorization"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
+# Variables para Telegram
+TELEGRAM_BOT_TOKEN = "7556223408:AAGJfGxqDN-KNQ-bwzijTyDmbxtV1iAptGM"
+TELEGRAM_CHAT_ID = "5821178446"
+
 # Lista en memoria para almacenar los mensajes enviados
 mensajes_enviados = []
+
+# Función para enviar mensaje a Telegram
+def enviar_a_telegram(mensaje):
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": mensaje
+    }
+    response = requests.post(url, json=payload)
+    if response.status_code != 200:
+        logger.error(f"Error enviando a Telegram: {response.text}")
+    return response.status_code, response.text
 
 # Ruta raíz para verificar que el backend funciona
 @app.route('/', methods=['GET'])
@@ -54,6 +71,9 @@ def send_message():
         
         mensajes_enviados.append(nuevo_mensaje)
         logger.info(f"Mensaje enviado a {contacto}: {mensaje}")
+
+        # Enviar mensaje a Telegram
+        enviar_a_telegram(f"Nuevo mensaje de {contacto}:\n{mensaje}")
         
         return jsonify({
             'status': 'Mensaje enviado correctamente',
